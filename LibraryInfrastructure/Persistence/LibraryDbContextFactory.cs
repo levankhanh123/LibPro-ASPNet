@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace LibraryInfrastructure.Persistence
@@ -10,7 +9,7 @@ namespace LibraryInfrastructure.Persistence
         {
             var optionsBuilder = new DbContextOptionsBuilder<LibraryDbContext>();
             // Cấu hình tạm thời để EF Core có thể tạo Migration
-            optionsBuilder.UseSqlServer("Server=.;Database=LibPro;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;");
+            optionsBuilder.UseMySQL("Server=localhost;Port=3306;Database=LibPro;Uid=root;Pwd=CHANGE_ME;SslMode=Preferred;");
             return new LibraryDbContext(optionsBuilder.Options);
         }
     }

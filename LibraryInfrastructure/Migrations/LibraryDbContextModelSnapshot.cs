@@ -20,8 +20,6 @@ namespace LibraryInfrastructure.Migrations
                 .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
             modelBuilder.Entity("LibraryDomain.Entities.Account", b =>
                 {
                     b.Property<Guid>("Id")

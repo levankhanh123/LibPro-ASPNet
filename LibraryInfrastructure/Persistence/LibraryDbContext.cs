@@ -64,8 +64,8 @@ namespace LibraryInfrastructure.Persistence
                 entity.Property(e => e.EntityName).HasMaxLength(100);
                 entity.Property(e => e.EntityId).HasMaxLength(100);
 
-                entity.Property(e => e.OldValues).HasColumnType("nvarchar(max)");
-                entity.Property(e => e.NewValues).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.OldValues).HasColumnType("longtext");
+                entity.Property(e => e.NewValues).HasColumnType("longtext");
 
                 entity.Property(e => e.Timestamp).IsRequired();
                 entity.HasIndex(e => e.Timestamp);

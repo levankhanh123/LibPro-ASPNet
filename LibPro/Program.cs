@@ -29,7 +29,7 @@ namespace LibPro
             var assetsPath = Path.Combine(builder.Environment.ContentRootPath, "assets");
 
             builder.Services.AddDbContext<LibraryDbContext>(options =>
-                            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")!));
 
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -164,7 +164,7 @@ namespace LibPro
                 try
                 {
                     var context = services.GetRequiredService<LibraryDbContext>();
-                    // context.Database.Migrate(); 
+                    context.Database.EnsureCreated();
                     DbInitializer.Seed(context);
                 }
                 catch (Exception ex)

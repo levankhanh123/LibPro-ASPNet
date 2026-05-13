@@ -85,7 +85,7 @@ namespace LibPro
             {
                 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
                     ?? builder.Configuration["Cors:AllowedOrigins"]?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    ?? ["http://localhost:5173"];
+                    ?? ["http://localhost:5173", "https://lib-pro-asp-net.vercel.app"];
 
                 options.AddPolicy("AllowReact",
                     policy => policy.WithOrigins(allowedOrigins)

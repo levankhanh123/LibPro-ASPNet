@@ -2,7 +2,6 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -13,6 +12,9 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["LibPro/LibPro.csproj", "LibPro/"]
+COPY ["LibraryApplication/LibraryApplication.csproj", "LibraryApplication/"]
+COPY ["LibraryDomain/LibraryDomain.csproj", "LibraryDomain/"]
+COPY ["LibraryInfrastructure/LibraryInfrastructure.csproj", "LibraryInfrastructure/"]
 RUN dotnet restore "./LibPro/LibPro.csproj"
 COPY . .
 WORKDIR "/src/LibPro"
@@ -27,4 +29,6 @@ RUN dotnet publish "./LibPro.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+RUN mkdir -p /app/assets/covers && chown -R $APP_UID /app/assets
+USER $APP_UID
 ENTRYPOINT ["dotnet", "LibPro.dll"]

@@ -9,6 +9,7 @@ using LibraryInfrastructure.Repositories;
 using LibraryInfrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -82,10 +83,21 @@ namespace LibPro
 
             builder.Services.AddCors(options =>
             {
+                var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                    ?? builder.Configuration["Cors:AllowedOrigins"]?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    ?? ["http://localhost:5173"];
+
                 options.AddPolicy("AllowReact",
-                    policy => policy.WithOrigins("http://localhost:5173")
+                    policy => policy.WithOrigins(allowedOrigins)
                                     .AllowAnyMethod()
                                     .AllowAnyHeader());
+            });
+
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownIPNetworks.Clear();
+                options.KnownProxies.Clear();
             });
 
             builder.Services.AddAuthentication(options => {
@@ -173,6 +185,8 @@ namespace LibPro
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseForwardedHeaders();
 
             app.UseExceptionHandler(errorApp =>
             {

@@ -5,20 +5,28 @@ import { authApi } from '../api/authApi';
 interface AuthContextType {
     user: User | null;
     profile: any;
-    login: (data: AuthResponse) => void;
+    login: (data: AuthResponse) => Promise<User | null>;
     logout: () => void;
     isAuthenticated: boolean;
 }
+
 interface AuthProviderProps {
     children: React.ReactNode;
 }
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<any>(null);
+
+    const buildFallbackProfile = (userData: User) => ({
+        id: userData.userId || userData.id,
+        username: userData.username,
+        role: userData.role,
+        fullName: userData.role === 'Director' ? 'Admin' : userData.username
+    });
 
     useEffect(() => {
         const loadInitialData = async () => {
@@ -33,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 const userId = currentUser.data?.userId;
 
                 if (!userId || userId === EMPTY_GUID) {
-                    console.warn("UserId trong token không hợp lệ, yêu cầu đăng nhập lại.");
+                    console.warn('Invalid userId in token. Please login again.');
                     logout();
                     return;
                 }
@@ -50,56 +58,51 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
                 setUser(userData);
                 localStorage.setItem('user', JSON.stringify(userData));
+                setProfile(buildFallbackProfile(userData));
 
-                const res = await authApi.getProfile(userId, token);
-                setProfile(res.data);
+                try {
+                    const res = await authApi.getProfile(token);
+                    setProfile(res.data);
+                } catch (err) {
+                    console.error('Error fetching profile on refresh:', err);
+                }
             } catch (err) {
-                console.error("Lỗi fetch profile khi refresh:", err);
+                console.error('Error restoring login session:', err);
                 logout();
             }
         };
+
         loadInitialData();
     }, []);
 
     const login = async (response: any) => {
         const data = response.data || response;
-
-        console.log("Cấu trúc thực tế nhận được:", data);
-
         const token = data.token;
 
         if (!token) {
-            console.error("Token bị trống!");
-            return;
+            console.error('Token is empty.');
+            return null;
         }
 
-        let currentUser;
+        localStorage.setItem('token', token);
 
+        let currentUser;
         try {
             currentUser = await authApi.getMyInfo(token);
         } catch (err) {
-            console.error("Lỗi lấy thông tin user từ token:", err);
-            return;
+            console.error('Error loading user info from token:', err);
+            localStorage.removeItem('token');
+            return null;
         }
 
         const userId = currentUser.data?.userId || data.id || data.userId;
-        const username = currentUser.data?.username || data.username;
-        const role = currentUser.data?.role || data.role;
+        const username = currentUser.data?.username || data.username || '';
+        const role = currentUser.data?.role || data.role || '';
 
         if (!userId) {
-            console.error("ID bị trống!");
-            return;
-        }
-
-        if (userId !== EMPTY_GUID) {
-            try {
-                const res = await authApi.getProfile(userId, token);
-                setProfile(res.data);
-            } catch (err) {
-                console.error("Lỗi lấy profile:", err);
-            }
-        } else {
-            setProfile({ fullName: "Quản trị viên", role: "Director" });
+            console.error('User id is empty.');
+            localStorage.removeItem('token');
+            return null;
         }
 
         const userData = {
@@ -112,23 +115,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('token', token);
+        setProfile(buildFallbackProfile(userData));
 
         if (userId === EMPTY_GUID) {
-            return;
+            return userData;
         }
 
         try {
-            const res = await authApi.getProfile(userId, token);
+            const res = await authApi.getProfile(token);
             setProfile(res.data);
-            console.log("Profile đã tải thành công:", res.data);
         } catch (err) {
-            console.error("Lỗi lấy profile sau login:", err);
+            console.error('Error fetching profile after login:', err);
         }
+
+        return userData;
     };
 
     const logout = () => {
         setUser(null);
+        setProfile(null);
         localStorage.clear();
     };
 
@@ -141,6 +146,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) throw new Error("useAuth must be used within an AuthProvider");
+    if (!context) throw new Error('useAuth must be used within AuthProvider');
     return context;
 };

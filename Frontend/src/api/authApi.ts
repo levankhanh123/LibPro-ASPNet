@@ -30,7 +30,7 @@ export const authApi = {
         headers: { Authorization: `Bearer ${token}` }
     }),
 
-    getProfile: (id: string, token: string) => axios.get(`${baseURL}/api/Auth/${id}`, {
+    getProfile: (token: string) => axios.get(`${baseURL}/api/Auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
     })
 };

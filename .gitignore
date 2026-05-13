@@ -1,12 +1,15 @@
 # --- BACKEND (.NET) ---
 [Bb]in/
 [Oo]bj/
+publish_output/
 *.user
 *.userosscache
 *.sln.docstates
 .vs/
 .vscode/
 appsettings.Development.json
+*.pem
+restore-diag.log
 # Không nên public appsettings.json nếu nó chứa Connection String thật
 # appsettings.json 
 

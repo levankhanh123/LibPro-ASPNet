@@ -101,6 +101,26 @@ namespace LibPro.Controllers
             return Ok(new { username, role, userId });
         }
 
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUserProfile()
+        {
+            try
+            {
+                var userId = User.FindFirst("UserId")?.Value;
+
+                if (!Guid.TryParse(userId, out var accountId))
+                    return Unauthorized(new { message = "Invalid user token." });
+
+                var account = await _accountService.GetAccountByIdAsync(accountId);
+                return Ok(account);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("debug-role")]
         [Authorize]
         public IActionResult DebugRole()

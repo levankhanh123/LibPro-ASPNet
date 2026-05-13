@@ -19,10 +19,16 @@ const LoginForm = () => {
             const token = responseData.token || res.data.token;
 
             if (token) {
-                login(responseData);
+                const userData = await login(responseData);
+
+                if (!userData) {
+                    alert("Login failed: Cannot load user information");
+                    return;
+                }
+
                 alert("Login Successful");
 
-                const role = responseData.role;
+                const role = userData.role;
                 console.log("Role received:", role);
 
                 switch (role) {

@@ -92,9 +92,9 @@ namespace LibraryApplication.Mappings
 
             CreateMap<Loan, LoanResponse>()
                 .ForMember(dest => dest.ReaderName, opt => opt.MapFrom(src =>
-                    src.Reader.FullName))
+                    src.Reader != null ? src.Reader.FullName : "N/A"))
                 .ForMember(dest => dest.StaffName, opt => opt.MapFrom(src =>
-                    src.IssuedByStaff.FullName))
+                    src.IssuedByStaff != null ? src.IssuedByStaff.FullName : "N/A"))
                 .ForMember(dest => dest.Details, opt => opt.MapFrom(src =>
                     src.Details))
                 .ForMember(dest => dest.LoanTicketNumber, opt => opt.MapFrom(src =>

@@ -224,6 +224,17 @@ namespace LibPro
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapGet("/", () => Results.Ok(new
+            {
+                service = "LibPro API",
+                status = "ok"
+            }));
+
+            app.MapGet("/health", () => Results.Ok(new
+            {
+                status = "healthy"
+            }));
+
             app.MapControllers();
 
             app.Run();

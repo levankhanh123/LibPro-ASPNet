@@ -24,8 +24,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const buildFallbackProfile = (userData: User) => ({
         id: userData.userId || userData.id,
         username: userData.username,
+        email: '',
         role: userData.role,
-        fullName: userData.role === 'Director' ? 'Admin' : userData.username
+        fullName: ''
     });
 
     useEffect(() => {

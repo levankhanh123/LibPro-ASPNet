@@ -175,6 +175,11 @@ namespace LibraryApplication.Services
             if (account == null) throw new EntityNotFoundException("Account", id);
 
             var response = _mapper.Map<AccountResponse>(account);
+            response.Id = account.Id;
+            response.Username = account.Username;
+            response.Email = account.Email;
+            response.Role = account.Role.ToString();
+            response.IsDeleted = account.IsDeleted;
 
             if (account.Role == UserRole.Reader) // Giả sử UserRole là Enum
             {

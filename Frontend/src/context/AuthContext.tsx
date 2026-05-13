@@ -14,30 +14,48 @@ interface AuthProviderProps {
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<any>(null);
 
     useEffect(() => {
         const loadInitialData = async () => {
-            const savedUser = localStorage.getItem('user');
             const token = localStorage.getItem('token');
 
-            if (savedUser && token) {
-                const parsedUser = JSON.parse(savedUser);
+            if (!token) {
+                return;
+            }
 
-                if (parsedUser.id && parsedUser.id !== '00000000-0000-0000-0000-000000000000') {
-                    setUser(parsedUser);
-                    try {
-                        const res = await authApi.getProfile(parsedUser.id, token);
-                        setProfile(res.data);
-                    } catch (err) {
-                        console.error("Lỗi fetch profile khi refresh:", err);
-                    }
-                } else {
-                    console.warn("ID trong localStorage không hợp lệ, yêu cầu đăng nhập lại.");
+            try {
+                const currentUser = await authApi.getMyInfo(token);
+                const userId = currentUser.data?.userId;
+
+                if (!userId || userId === EMPTY_GUID) {
+                    console.warn("UserId trong token không hợp lệ, yêu cầu đăng nhập lại.");
                     logout();
+                    return;
                 }
+
+                const storedUser = localStorage.getItem('user');
+                const parsedUser = storedUser ? JSON.parse(storedUser) : {};
+                const userData = {
+                    id: userId,
+                    userId,
+                    username: currentUser.data?.username || parsedUser.username || '',
+                    role: currentUser.data?.role || parsedUser.role || '',
+                    token
+                };
+
+                setUser(userData);
+                localStorage.setItem('user', JSON.stringify(userData));
+
+                const res = await authApi.getProfile(userId, token);
+                setProfile(res.data);
+            } catch (err) {
+                console.error("Lỗi fetch profile khi refresh:", err);
+                logout();
             }
         };
         loadInitialData();
@@ -48,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         console.log("Cấu trúc thực tế nhận được:", data);
 
-        const userId = data.id;
+        const userId = data.id || data.userId;
         const token = data.token;
 
         if (!userId) {
@@ -56,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             return;
         }
 
-        if (userId !== '00000000-0000-0000-0000-000000000000') {
+        if (userId !== EMPTY_GUID) {
             try {
                 const res = await authApi.getProfile(userId, token);
                 setProfile(res.data);
@@ -69,6 +87,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         const userData = {
             id: userId,
+            userId,
             username: data.username,
             role: data.role,
             token: data.token
@@ -77,6 +96,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('token', token);
+
+        if (userId === EMPTY_GUID) {
+            return;
+        }
 
         try {
             const res = await authApi.getProfile(userId, token);

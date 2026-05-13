@@ -231,6 +231,12 @@ namespace LibraryInfrastructure.Persistence
 
                 entity.Property(r => r.FullName).IsRequired().HasMaxLength(200);
 
+                entity.Property(r => r.DateOfBirth)
+                      .HasConversion(
+                          v => v.ToDateTime(TimeOnly.MinValue),
+                          v => DateOnly.FromDateTime(v))
+                      .HasColumnType("date");
+
                 entity.Property(r => r.Gender)
                     .HasConversion(v => v.Value, v => Gender.FromValue(v)) // Chuyển đổi Object <-> int
                     .HasColumnName("Gender")
@@ -334,6 +340,12 @@ namespace LibraryInfrastructure.Persistence
                 entity.HasIndex(s => s.StaffCode).IsUnique();
 
                 entity.Property(s => s.FullName).IsRequired().HasMaxLength(200);
+
+                entity.Property(s => s.DateOfBirth)
+                      .HasConversion(
+                          v => v.ToDateTime(TimeOnly.MinValue),
+                          v => DateOnly.FromDateTime(v))
+                      .HasColumnType("date");
 
                 entity.Property(s => s.Gender)
                         .HasConversion(v => v.Value, v => Gender.FromValue(v))

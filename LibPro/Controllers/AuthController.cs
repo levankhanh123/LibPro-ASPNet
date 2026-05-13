@@ -75,7 +75,7 @@ namespace LibPro.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         [Authorize]
         public async Task<IActionResult> GetProfile(Guid id)
         {

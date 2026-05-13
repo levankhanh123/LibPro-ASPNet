@@ -10,6 +10,7 @@ interface Props {
 
 const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
     const activeItems = book.bookItems?.filter((i: any) => !i.isDeleted) || [];
+    const [borrowDays, setBorrowDays] = useState(7);
 
     const [selectedBarcode, setSelectedBarcode] = useState<string | undefined>(
         book.isDigital ? undefined : activeItems.find(i => String(i.status) === "Available")?.barcode
@@ -32,7 +33,19 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
     return (
         <div className="modal-overlay">
             <div className="modal-content">
-                <h3>Reserve book: {book.title}</h3>
+                <h3>Borrow book: {book.title}</h3>
+
+                <div className="form-group" style={{ marginTop: '15px' }}>
+                    <label>Number of days to borrow:</label>
+                    <input
+                        type="number"
+                        min={1}
+                        max={30}
+                        value={borrowDays}
+                        onChange={(e) => setBorrowDays(Number(e.target.value) || 1)}
+                        className="form-control"
+                    />
+                </div>
 
                 <div className="form-group" style={{ marginTop: '15px' }}>
                     <label>Choose a book item:</label>
@@ -69,7 +82,7 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
                         className="btn-confirm"
                         disabled={!book.isDigital && !selectedBarcode}
                     >
-                        Confirm reservation
+                        Confirm borrow
                     </button>
                 </div>
             </div>

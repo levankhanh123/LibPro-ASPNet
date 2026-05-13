@@ -33,7 +33,7 @@ const BookGallery = () => {
     const handleBorrowSubmit = async (request: ReserveBookRequest) => {
         try {
             await reservationApi.reserveBook(request);
-            alert("Reservation successful. Please wait for librarian confirmation.");
+            alert("Book request submitted successfully.");
             setSelectedBook(null);
             loadBooks();
         } catch (error: any) {

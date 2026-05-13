@@ -74,6 +74,8 @@ namespace LibraryInfrastructure.Repositories
         public async Task<IEnumerable<Loan>> GetByReaderIdAsync(Guid readerId)
         {
             return await _context.Loans
+                    .Include(l => l.Reader)
+                    .Include(l => l.IssuedByStaff)
                     .Include(l => l.Details)
                         .ThenInclude(d => d.BookItem)
                             .ThenInclude(bi => bi.Book)

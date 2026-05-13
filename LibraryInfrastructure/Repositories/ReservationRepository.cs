@@ -51,6 +51,9 @@ namespace LibraryInfrastructure.Repositories
         public async Task<IEnumerable<Reservation>> GetActiveReservationsByReaderAsync(Guid readerId)
         {
             return await _context.Reservations
+                .Include(r => r.Reader)
+                .Include(r => r.BookItem)
+                    .ThenInclude(bi => bi.Book)
                 .Where(r => r.ReaderId == readerId &&
                            (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Ready))
                 .OrderBy(r => r.ReservedDate)

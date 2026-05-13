@@ -66,8 +66,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         console.log("Cấu trúc thực tế nhận được:", data);
 
-        const userId = data.id || data.userId;
         const token = data.token;
+
+        if (!token) {
+            console.error("Token bị trống!");
+            return;
+        }
+
+        let currentUser;
+
+        try {
+            currentUser = await authApi.getMyInfo(token);
+        } catch (err) {
+            console.error("Lỗi lấy thông tin user từ token:", err);
+            return;
+        }
+
+        const userId = currentUser.data?.userId || data.id || data.userId;
+        const username = currentUser.data?.username || data.username;
+        const role = currentUser.data?.role || data.role;
 
         if (!userId) {
             console.error("ID bị trống!");
@@ -88,9 +105,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const userData = {
             id: userId,
             userId,
-            username: data.username,
-            role: data.role,
-            token: data.token
+            username,
+            role,
+            token
         };
 
         setUser(userData);

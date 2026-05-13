@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { BookResponse } from '../../types/book';
-import { LoanItemRequest, OnlineLoanRequest } from '../../types/loan';
+import { ReserveBookRequest } from '../../types/reservation';
 
 interface Props {
     book: BookResponse;
     onClose: () => void;
-    onConfirm: (request: OnlineLoanRequest) => void;
+    onConfirm: (request: ReserveBookRequest) => void;
 }
 
 const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
-    const [loanDays, setLoanDays] = useState(14);
-
     const activeItems = book.bookItems?.filter((i: any) => !i.isDeleted) || [];
 
     const [selectedBarcode, setSelectedBarcode] = useState<string | undefined>(
@@ -23,15 +21,9 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
             return;
         }
 
-        const selectedItem: LoanItemRequest = {
+        const request: ReserveBookRequest = {
             bookId: book.id,
-            isDigital: book.isDigital,
-            barcode: selectedBarcode
-        };
-
-        const request: OnlineLoanRequest = {
-            bookItemsId: [selectedItem],
-            loanDays: loanDays
+            barcode: selectedBarcode ?? ''
         };
 
         onConfirm(request);
@@ -40,19 +32,7 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
     return (
         <div className="modal-overlay">
             <div className="modal-content">
-                <h3>Borrow book: {book.title}</h3>
-
-                <div className="form-group">
-                    <label>Borrow number:</label>
-                    <input
-                        type="number"
-                        value={loanDays}
-                        onChange={(e) => setLoanDays(parseInt(e.target.value) || 0)}
-                        min={1}
-                        max={30}
-                        className="form-control"
-                    />
-                </div>
+                <h3>Reserve book: {book.title}</h3>
 
                 <div className="form-group" style={{ marginTop: '15px' }}>
                     <label>Choose a book item:</label>
@@ -89,7 +69,7 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
                         className="btn-confirm"
                         disabled={!book.isDigital && !selectedBarcode}
                     >
-                        Reserve book
+                        Confirm reservation
                     </button>
                 </div>
             </div>

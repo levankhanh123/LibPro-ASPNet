@@ -86,7 +86,10 @@ namespace LibraryApplication.Services
 
             // Tạo Value Object Address mới từ Request
             var newAddress = new LibraryDomain.ValueObjects.Address(
-                request.Street, request.Ward, request.District, request.City);
+                string.IsNullOrWhiteSpace(request.Street) ? staff.Address.Street : request.Street,
+                string.IsNullOrWhiteSpace(request.Ward) ? staff.Address.Ward : request.Ward,
+                string.IsNullOrWhiteSpace(request.District) ? staff.Address.District : request.District,
+                string.IsNullOrWhiteSpace(request.City) ? staff.Address.City : request.City);
 
             // Cập nhật thông qua phương thức của Entity (Domain Driven)
             staff.UpdateInfo(request.FullName, newAddress, request.PhoneNumber, request.IsDeleted);

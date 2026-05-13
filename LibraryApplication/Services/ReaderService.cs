@@ -114,7 +114,10 @@ namespace LibraryApplication.Services
             if (reader == null) throw new EntityNotFoundException("Reader", id);
 
             var newAddress = new LibraryDomain.ValueObjects.Address(
-                request.Street, request.Ward, request.District, request.City);
+                string.IsNullOrWhiteSpace(request.Street) ? reader.Address.Street : request.Street,
+                string.IsNullOrWhiteSpace(request.Ward) ? reader.Address.Ward : request.Ward,
+                string.IsNullOrWhiteSpace(request.District) ? reader.Address.District : request.District,
+                string.IsNullOrWhiteSpace(request.City) ? reader.Address.City : request.City);
 
             reader.UpdateProfile(request.FullName, newAddress, request.PhoneNumber, request.IsDeleted);
 

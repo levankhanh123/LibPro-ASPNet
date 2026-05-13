@@ -29,8 +29,11 @@ namespace LibraryInfrastructure.Repositories
         public async Task<Book?> GetByIdAsync(Guid id) =>
             await _context.Books.Include(b => b.BookItems.Where(bi => !bi.IsDeleted)).FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
 
-        public async Task<Book?> GetByIsbnAsync(string isbn) =>
-            await _context.Books.FirstOrDefaultAsync(b => (string)(object)b.Isbn == isbn);
+        public async Task<Book?> GetByIsbnAsync(string isbn)
+        {
+            var normalizedIsbn = new Isbn(isbn);
+            return await _context.Books.FirstOrDefaultAsync(b => b.Isbn == normalizedIsbn);
+        }
         
         public async Task<Book?> GetByIdIncludeDeletedAsync(Guid id) =>
             await _context.Books.IgnoreQueryFilters().Include(b => b.BookItems).FirstOrDefaultAsync(b => b.Id == id);

@@ -6,7 +6,7 @@ const AdminLayout = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
+        logout();
         navigate('/login');
     };
 

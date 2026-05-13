@@ -15,6 +15,7 @@ namespace LibraryApplication.DTOs.Loans
         public string? DigitalFilePath { get; set; }
         public string? AccessToken { get; set; }
         public string? ReaderName { get; set; }
+        public DateTime LoanDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
 

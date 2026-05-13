@@ -102,6 +102,7 @@ namespace LibPro.Controllers
         public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateLoanStatusRequest request)
         {
             // request chứa NewLoanStatus và NewBookStatus
+            request.LoanDetailId = id;
             await _loanService.UpdateStatusAsync(request);
             return Ok(new { Message = "Cập nhật trạng thái thành công!" });
         }

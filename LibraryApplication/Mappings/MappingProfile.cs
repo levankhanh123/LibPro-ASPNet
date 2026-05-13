@@ -60,7 +60,7 @@ namespace LibraryApplication.Mappings
                 ));
             CreateMap<Reader, ReaderResponse>()
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src =>
-                    src.IsMembershipActive() && src.IsDeleted))
+                    src.IsDeleted))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src =>
                     src.Gender.Value))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src =>
@@ -112,6 +112,8 @@ namespace LibraryApplication.Mappings
                 .ForMember(dest => dest.ReturnDate, opt => opt.MapFrom(src => src.ReturnDate))
                 .ForMember(dest => dest.ReaderName, opt => opt.MapFrom(src =>
                     src.Loan != null && src.Loan.Reader != null ? src.Loan.Reader.FullName : "N/A"))
+                .ForMember(dest => dest.LoanDate, opt => opt.MapFrom(src =>
+                    src.Loan != null ? src.Loan.LoanDate : default))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.FineAmount, opt => opt.MapFrom(src =>
                     src.FineAmount != null ? src.FineAmount.Amount : 0))

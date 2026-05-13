@@ -8,6 +8,7 @@ interface AuthContextType {
     login: (data: AuthResponse) => Promise<User | null>;
     logout: () => void;
     isAuthenticated: boolean;
+    isLoading: boolean;
 }
 
 interface AuthProviderProps {
@@ -20,6 +21,7 @@ const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const buildFallbackProfile = (userData: User) => ({
         id: userData.userId || userData.id,
@@ -34,6 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const token = localStorage.getItem('token');
 
             if (!token) {
+                setIsLoading(false);
                 return;
             }
 
@@ -70,6 +73,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             } catch (err) {
                 console.error('Error restoring login session:', err);
                 logout();
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -139,7 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, profile, login, logout, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{ user, profile, login, logout, isAuthenticated: !!user, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

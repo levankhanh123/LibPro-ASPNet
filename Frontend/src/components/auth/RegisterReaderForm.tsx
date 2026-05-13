@@ -42,7 +42,7 @@ const RegisterReaderForm = () => {
                         <div className="form-row">
                             <select value={formData.gender} onChange={e => setFormData({ ...formData, gender: parseInt(e.target.value) })}>
                                 <option value={1}>Male</option>
-                                <option value={2}>Female</option>
+                                <option value={0}>Female</option>
                             </select>
                             <input type="date" required onChange={e => setFormData({ ...formData, dateOfBirth: e.target.value })} />
                         </div>

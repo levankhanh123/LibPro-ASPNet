@@ -52,7 +52,7 @@ namespace LibPro.Controllers
             {
                 return NotFound(new { Error = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest(new { Error = "Could not load your reservations." });
             }

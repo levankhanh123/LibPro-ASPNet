@@ -59,9 +59,7 @@ namespace LibraryDomain.Entities
             Status = newStatus;
 
             if (
-                newStatus == LoanStatus.Active ||
                 newStatus == LoanStatus.Returned ||
-                newStatus == LoanStatus.Overdue ||
                 newStatus == LoanStatus.PendingFine ||
                 newStatus == LoanStatus.Closed ||
                 newStatus == LoanStatus.Lost)

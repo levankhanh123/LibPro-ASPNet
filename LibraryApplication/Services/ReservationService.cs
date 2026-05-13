@@ -51,10 +51,9 @@ namespace LibraryApplication.Services
         public async Task ReserveBookAsync(ReserveBookRequest request)
         {
             var userId = _currentUserService.UserId;
-            var readerId = request.ReaderId.Value;
 
             var reader = await _readerRepository.GetByAccountIdAsync(userId)
-                ?? throw new EntityNotFoundException("Reader", readerId);
+                ?? throw new EntityNotFoundException("Reader", userId);
             
             if (reader.HasOverdueLoans())
                 throw new DomainException("Cant reserve books with overdue loans.");

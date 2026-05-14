@@ -41,21 +41,15 @@ const ReaderReservationHistory: React.FC = () => {
         }
     };
 
-    // Hàm helper để hiển thị màu sắc trạng thái
-    const getStatusStyle = (status: string) => {
-        switch (status) {
-            case 'Ready': return { color: '#52c41a', fontWeight: 'bold' }; // Sách đã có sẵn
-            case 'Pending': return { color: '#faad14', fontWeight: 'bold' }; // Đang chờ trả sách
-            default: return { color: '#999' };
-        }
-    };
+    const isReady = (status: string) => status === 'Ready' || status === '2';
 
     return (
         <div className="loan-history-container">
-            <h3>My Reservations</h3>
-            <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '20px' }}>
-                Note: When the status changes to <b>"Ready"</b>, please come to the library to pick up the book before the expiration date.
-            </p>
+            <div className="page-header">
+                <div>
+                    <h2>My Reservations</h2>
+                </div>
+            </div>
 
             <table className="management-table">
                 <thead>
@@ -70,31 +64,23 @@ const ReaderReservationHistory: React.FC = () => {
                 </thead>
                 <tbody>
                     {loading ? (
-                        <tr><td colSpan={6} style={{ textAlign: 'center' }}>Loading...</td></tr>
+                        <tr><td colSpan={6} className="empty-cell">Loading...</td></tr>
                     ) : reservations.length === 0 ? (
-                        <tr><td colSpan={6} style={{ textAlign: 'center' }}>You have no reservation requests.</td></tr>
+                        <tr><td colSpan={6} className="empty-cell">You have no reservation requests.</td></tr>
                     ) : (
                         reservations.map((item) => (
                             <tr key={item.id}>
-                                <td style={{ fontWeight: 500 }}>{item.bookTitle}</td>
+                                <td><strong>{item.bookTitle}</strong></td>
                                 <td><code>{item.barcode}</code></td>
                                 <td>{new Date(item.reservedDate).toLocaleDateString('vi-VN')}</td>
                                 <td>{item.expiryDate ? new Date(item.expiryDate).toLocaleDateString('vi-VN') : '---'}</td>
-                                <td style={getStatusStyle(item.status)}>
-                                    {item.status === 'Ready' ? '● Ready to pick up' : '○ Pending'}
+                                <td>
+                                    <span className={`status-pill ${isReady(item.status) ? 'available' : 'unavailable'}`}>
+                                        {isReady(item.status) ? 'Ready to pick up' : 'Pending'}
+                                    </span>
                                 </td>
                                 <td>
-                                    <button
-                                        onClick={() => handleCancel(item.id)}
-                                        style={{
-                                            padding: '4px 8px',
-                                            backgroundColor: 'transparent',
-                                            color: '#ff4d4f',
-                                            border: '1px solid #ff4d4f',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
+                                    <button className="btn-delete" onClick={() => handleCancel(item.id)}>
                                         Cancel Reservation
                                     </button>
                                 </td>

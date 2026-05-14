@@ -62,7 +62,7 @@ const RegisterReaderForm = () => {
                     </section>
 
                     <div className="form-row">
-                        <div style={{ flex: 1 }}>
+                        <div className="form-group">
                             <label><small>Reader Type</small></label>
                             <select
                                 className="form-control"

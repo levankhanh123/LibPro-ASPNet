@@ -55,10 +55,12 @@ const PublisherManagement = () => {
 
     return (
         <div className="main-content">
-            <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ color: 'var(--accent)' }}>Publisher Management</h2>
+            <div className="header-actions">
+                <div>
+                    <h2>Publisher Management</h2>
+                </div>
                 <button className="btn-add" onClick={() => { setEditingPub(null); setIsModalOpen(true); }}>
-                    + Add New Publisher
+                    Add New Publisher
                 </button>
             </div>
 

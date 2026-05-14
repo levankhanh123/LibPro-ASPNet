@@ -11,7 +11,6 @@ interface Props {
 const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
     const activeItems = book.bookItems?.filter((i: any) => !i.isDeleted) || [];
     const [borrowDays, setBorrowDays] = useState(7);
-
     const [selectedBarcode, setSelectedBarcode] = useState<string | undefined>(
         book.isDigital ? undefined : activeItems.find(i => String(i.status) === "Available")?.barcode
     );
@@ -32,11 +31,12 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content">
-                <h3>Borrow book: {book.title}</h3>
+            <div className="modal-content modal-narrow">
+                <h3>Borrow Book</h3>
+                <p className="modal-copy"><strong>{book.title}</strong></p>
 
-                <div className="form-group" style={{ marginTop: '15px' }}>
-                    <label>Number of days to borrow:</label>
+                <div className="form-group">
+                    <label>Borrow Days</label>
                     <input
                         type="number"
                         min={1}
@@ -47,27 +47,25 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
                     />
                 </div>
 
-                <div className="form-group" style={{ marginTop: '15px' }}>
-                    <label>Choose a book item:</label>
+                <div className="form-group">
+                    <label>Book Copy</label>
                     {book.isDigital ? (
-                        <p className="status-available">E-Book (Always available)</p>
+                        <p className="status-pill available">E-Book available</p>
                     ) : (
                         <select
                             value={selectedBarcode}
                             onChange={(e) => setSelectedBarcode(e.target.value)}
                             className="form-control"
                         >
-                            {!selectedBarcode && <option value="">-- Choose a copy --</option>}
+                            {!selectedBarcode && <option value="">Choose a copy</option>}
                             {activeItems.map((item: any) => (
                                 <option
                                     key={item.id}
                                     value={item.barcode}
-                                    // Kiểm tra status bằng chuỗi "Available"
                                     disabled={String(item.status) !== "Available"}
                                 >
                                     {item.barcode}
-                                    {String(item.status) === "Available" ? ' (Available)' : ' (Borrowed/Broken)'}
-                                    {/* Dùng .location vì AutoMapper đã đổi tên ShelfLocation -> Location */}
+                                    {String(item.status) === "Available" ? ' (Available)' : ' (Unavailable)'}
                                     {item.location ? ` - Shelf: ${item.location}` : ''}
                                 </option>
                             ))}
@@ -75,14 +73,14 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
                     )}
                 </div>
 
-                <div className="modal-actions" style={{ marginTop: '20px' }}>
+                <div className="modal-actions">
                     <button onClick={onClose} className="btn-cancel">Cancel</button>
                     <button
                         onClick={handleConfirm}
                         className="btn-confirm"
                         disabled={!book.isDigital && !selectedBarcode}
                     >
-                        Confirm borrow
+                        Confirm Borrow
                     </button>
                 </div>
             </div>

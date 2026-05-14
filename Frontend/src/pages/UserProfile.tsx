@@ -5,87 +5,40 @@ const UserProfile: React.FC = () => {
     const { profile } = useAuth();
 
     if (!profile) {
-        return <div style={{ padding: '20px', color: 'white' }}>Loading profile information...</div>;
+        return <div className="empty-state">Loading profile information...</div>;
     }
 
+    const avatarText = profile.fullName?.charAt(0).toUpperCase() || profile.username?.charAt(0).toUpperCase();
+
     return (
-        <div className="profile-page-container" style={{ padding: '30px', color: '#fff' }}>
-            <h2 style={{ borderBottom: '2px solid #ff4e50', paddingBottom: '10px', marginBottom: '20px' }}>
-                Your Profile
-            </h2>
-
-            <div className="profile-card" style={{
-                background: 'rgba(255,255,255,0.05)',
-                padding: '30px',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '20px'
-            }}>
-                {/* Avatar bên trái */}
-                <div style={{
-                    width: '100px',
-                    height: '100px',
-                    borderRadius: '50%',
-                    background: '#ff4e50',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '40px',
-                    fontWeight: 'bold',
-                    flexShrink: 0
-                }}>
-                    {profile.fullName?.charAt(0).toUpperCase() || profile.username?.charAt(0).toUpperCase()}
+        <div className="profile-page-container">
+            <div className="page-header">
+                <div>
+                    <h2>Your Profile</h2>
                 </div>
+            </div>
 
-                {/* Khối văn bản đã được đẩy sang trái và căn lề trái */}
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '15px',
-                    textAlign: 'left' 
-                }}>
-                    <div>
-                        <label style={{ color: '#888', fontSize: '11px', display: 'block', marginBottom: '4px', textTransform: 'uppercase' }}>
-                            Full Name
-                        </label>
-                        <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
-                            {profile.fullName || "Not updated"}
-                        </div>
-                    </div>
-
-                    <div>
-                        <label style={{ color: '#888', fontSize: '11px', display: 'block', marginBottom: '4px', textTransform: 'uppercase' }}>
-                            Username
-                        </label>
-                        <div style={{ fontSize: '16px' }}>@{profile.username}</div>
-                    </div>
-
-                    <div>
-                        <label style={{ color: '#888', fontSize: '11px', display: 'block', marginBottom: '4px', textTransform: 'uppercase' }}>
-                            Email
-                        </label>
-                        <div style={{ fontSize: '16px' }}>{profile.email}</div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <label style={{ color: '#888', fontSize: '11px', textTransform: 'uppercase' }}>
-                            Role:
-                        </label>
-                        <span style={{
-                            padding: '4px 12px',
-                            background: '#ff4e50',
-                            borderRadius: '6px',
-                            fontSize: '12px',
-                            fontWeight: 'bold'
-                        }}>
-                            {profile.role}
-                        </span>
+            <div className="profile-card">
+                <div className="profile-avatar">{avatarText}</div>
+                <div className="profile-info">
+                    <ProfileField label="Full Name" value={profile.fullName || 'Not updated'} />
+                    <ProfileField label="Username" value={`@${profile.username}`} />
+                    <ProfileField label="Email" value={profile.email || 'Not updated'} />
+                    <div className="profile-field">
+                        <span>Role</span>
+                        <strong className="status-pill available">{profile.role}</strong>
                     </div>
                 </div>
             </div>
         </div>
     );
 };
+
+const ProfileField = ({ label, value }: { label: string; value: string }) => (
+    <div className="profile-field">
+        <span>{label}</span>
+        <strong>{value}</strong>
+    </div>
+);
 
 export default UserProfile;

@@ -37,10 +37,12 @@ const CategoryManagement = () => {
 
     return (
         <div className="main-content">
-            <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ color: 'var(--accent)' }}></h2>
+            <div className="header-actions">
+                <div>
+                    <h2>Category Management</h2>
+                </div>
                 <button className="btn-add" onClick={() => setShowAddForm(true)}>
-                    ➕ Add New Category
+                    Add New Category
                 </button>
             </div>
 
@@ -50,17 +52,17 @@ const CategoryManagement = () => {
                         <h3>Add New Category</h3>
                         <form onSubmit={handleCreate} className="book-form">
                             <div className="form-group">
-                                <label>Category Name:</label>
+                                <label>Category Name</label>
                                 <input type="text" value={newCategory.name} onChange={e => setNewCategory({ ...newCategory, name: e.target.value })} required />
                             </div>
                             <div className="form-group">
-                                <label>Description:</label>
+                                <label>Description</label>
                                 <input type="text" value={newCategory.description} onChange={e => setNewCategory({ ...newCategory, description: e.target.value })} />
                             </div>
                             <div className="form-group">
-                                <label>Parent Category:</label>
-                                <select value={newCategory.parentCategoryId || ""} onChange={e => setNewCategory({ ...newCategory, parentCategoryId: e.target.value || null })} >
-                                    <option value="">-- No parent (Root category) --</option>
+                                <label>Parent Category</label>
+                                <select value={newCategory.parentCategoryId || ""} onChange={e => setNewCategory({ ...newCategory, parentCategoryId: e.target.value || null })}>
+                                    <option value="">No parent</option>
                                     {categories.map(cat => (
                                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                                     ))}
@@ -89,7 +91,7 @@ const CategoryManagement = () => {
                             <tr key={cat.id}>
                                 <td>{cat.name}</td>
                                 <td>{cat.description}</td>
-                                <td style={{ textAlign: 'center' }}>{cat.bookCount}</td>
+                                <td className="text-center">{cat.bookCount}</td>
                             </tr>
                         ))}
                     </tbody>

@@ -55,10 +55,12 @@ const SupplierManagement = () => {
 
     return (
         <div className="main-content">
-            <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ color: 'var(--accent)' }}>Supplier Management</h2>
+            <div className="header-actions">
+                <div>
+                    <h2>Supplier Management</h2>
+                </div>
                 <button className="btn-add" onClick={() => { setEditingSup(null); setIsModalOpen(true); }}>
-                    + Register Supplier
+                    Register Supplier
                 </button>
             </div>
 

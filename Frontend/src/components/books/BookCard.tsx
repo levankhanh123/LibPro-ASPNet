@@ -1,5 +1,4 @@
 import React from 'react';
-import { bookApi } from '../../api/bookApi';
 import { BookResponse } from '../../types/book';
 
 interface Props {
@@ -24,7 +23,6 @@ const BookCard: React.FC<Props> = ({ book, onBorrow }) => {
         <div className="book-card">
             <img
                 src={getImageUrl(book.coverImageUrl)}
-                style={{ width: '40px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
                 alt={book.title}
                 onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://placehold.co/40x60?text=Error';

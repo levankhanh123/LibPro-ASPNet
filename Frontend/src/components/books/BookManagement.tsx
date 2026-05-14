@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { bookApi } from '../../api/bookApi';
 import BookFormModal from '../books/BookFormModal';
-import { useNavigate } from 'react-router-dom';
 
 const BookManagement = () => {
-    const navigate = useNavigate();
-
     const [books, setBooks] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -15,17 +12,15 @@ const BookManagement = () => {
 
     useEffect(() => { loadBooks(); }, []);
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-    };
-
     const loadBooks = async () => {
         try {
             const res = await bookApi.getAll();
             setBooks(res.data);
-        } catch (error) { console.error("Error:", error); }
-        finally { setLoading(false); }
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSave = async (formData: FormData) => {
@@ -39,7 +34,9 @@ const BookManagement = () => {
             }
             setShowForm(false);
             loadBooks();
-        } catch (error: any) { alert("Error while saving!"); }
+        } catch (error: any) {
+            alert("Error while saving!");
+        }
     };
 
     const handleViewCopies = async (bookId: string) => {
@@ -48,37 +45,15 @@ const BookManagement = () => {
             if (res.data && res.data.bookItems) {
                 setSelectedBookItems(res.data.bookItems);
                 setSelectedBookId(bookId);
-        }
-            else
+            } else {
                 console.error("", res.data);
+            }
         } catch (error) {
             alert("Cant load book item list.");
         }
     };
 
-    const handleAddCopy = async () => {
-        if (!selectedBookId) return;
-
-        const location = window.prompt("Enter Shelf Location:", "???");
-        if (location === null) return;
-
-        try {
-            await bookApi.addBookItem({
-                bookId: selectedBookId,
-                shelfLocation: location,
-                quantity: 1
-            });
-
-            alert("Added new copy successfully!");
-            handleViewCopies(selectedBookId);
-            loadBooks();
-        } catch (error) {
-            alert("Error adding new copy");
-        }
-    };
-
     const handleUpdateStatus = async (itemId: string, newStatus: number) => {
-        // 1. Kiểm tra ID ngay lập tức
         if (!itemId || itemId === "undefined") {
             console.error("Error: BookItemID not exists!", itemId);
             alert("No book item found.");
@@ -102,14 +77,12 @@ const BookManagement = () => {
         if (window.confirm("Delete this copy?")) {
             try {
                 await bookApi.deleteBookItem(itemId);
-
                 if (selectedBookItems) {
                     const updatedItems = selectedBookItems.map(item =>
                         item.id === itemId ? { ...item, isDeleted: true, status: 'Discarded' } : item
                     );
                     setSelectedBookItems(updatedItems);
                 }
-
                 loadBooks();
                 alert("Delete book success!");
             } catch (error) {
@@ -121,16 +94,13 @@ const BookManagement = () => {
     const handleRestoreItem = async (itemId: string) => {
         try {
             await bookApi.restoreBookItem(itemId);
-
             if (selectedBookItems) {
                 const updatedItems = selectedBookItems.map(item =>
                     item.id === itemId ? { ...item, isDeleted: false } : item
                 );
                 setSelectedBookItems(updatedItems);
             }
-
             loadBooks();
-
             alert("Restore successful!");
         } catch (error) {
             console.error("Restore error:", error);
@@ -154,7 +124,7 @@ const BookManagement = () => {
         const s = typeof status === 'string' ? status : String(status);
         if (s === '1' || s === 'Available') return 'available';
         if (s === '2' || s === 'Reserved' || s === '3' || s === 'Loaned') return 'unavailable';
-        return 'maintenance'; // Cho các trạng thái InRepair, Lost...
+        return 'maintenance';
     };
 
     const getImageUrl = (url: string) => {
@@ -165,91 +135,86 @@ const BookManagement = () => {
 
     return (
         <div className="main-content">
-            <header className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <h2 style={{ color: 'var(--accent)' }}>Book Management</h2>
+            <header className="header-actions">
+                <div>
+                    <h2>Book Management</h2>
+                </div>
                 <button className="btn-add" onClick={() => { setEditingBook(null); setShowForm(true); }}>
-                    ➕ Add New Book
+                    Add New Book
                 </button>
             </header>
 
-            <table className="data-table">
-                <thead>
-                    <tr>
-                        <th>Book Information</th>
-                        <th>ISBN</th>
-                        <th>Quantity</th>
-                        <th>Type</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {books.map((book) => (
-                        <tr key={book.id}>
-                            <td>
-                                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                                    <img src={getImageUrl(book.coverImageUrl)} className="book-cover-small" style={{ width: '45px', borderRadius: '4px' }} alt="" />
-                                    <div>
-                                        <div style={{ fontWeight: 'bold' }}>{book.title}</div>
-                                        <small>{book.author}</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>{book.isbn}</td>
-                            <td style={{ textAlign: 'center' }}>
-                                <span style={{ fontWeight: 'bold', color: book.availableCopies > 0 ? '#28a745' : '#dc3545' }}>
-                                    {book.availableCopies}
-                                </span> / {book.totalCopies}
-                            </td>
-                            <td>{book.isDigital ? <span className="badge-digital">E-Book</span> : "Physical book"}</td>
-                            <td>
-                                <div style={{ display: 'flex', gap: '5px' }}>
-                                    <button className="btn-restore" onClick={() => { setEditingBook(book); setShowForm(true); }}>Edit</button>
-                                    <button className="btn-add" onClick={() => handleViewCopies(book.id)}>
-                                        Copied
-                                    </button>
-                                </div>
-                            </td>
+            {loading ? <p>Loading data...</p> : (
+                <table className="data-table">
+                    <thead>
+                        <tr>
+                            <th>Book Information</th>
+                            <th>ISBN</th>
+                            <th>Quantity</th>
+                            <th>Type</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {books.map((book) => (
+                            <tr key={book.id}>
+                                <td>
+                                    <div className="book-table-info">
+                                        <img src={getImageUrl(book.coverImageUrl)} className="book-cover-small" alt="" />
+                                        <div>
+                                            <div className="table-title">{book.title}</div>
+                                            <small>{book.author}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{book.isbn}</td>
+                                <td className="text-center">
+                                    <span className={book.availableCopies > 0 ? 'success-text' : 'danger-text'}>
+                                        {book.availableCopies}
+                                    </span> / {book.totalCopies}
+                                </td>
+                                <td>{book.isDigital ? <span className="badge-digital">E-Book</span> : "Physical book"}</td>
+                                <td>
+                                    <div className="table-actions">
+                                        <button className="btn-restore" onClick={() => { setEditingBook(book); setShowForm(true); }}>Edit</button>
+                                        <button className="btn-add" onClick={() => handleViewCopies(book.id)}>Copies</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
 
-            {/* Modal hiển thị danh sách bản sao (BookItems) */}
             {selectedBookItems && (
                 <div className="modal-overlay">
-                    <div className="modal-content" style={{ maxWidth: '800px' }}>
-                        <h3 style={{ color: 'var(--accent)', marginBottom: '15px' }}>Detailed Copy List</h3>
-                        <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                    <div className="modal-content modal-wide">
+                        <h3>Detailed Copy List</h3>
+                        <div className="table-scroll">
                             <table className="data-table">
                                 <thead>
                                     <tr>
                                         <th>Barcode</th>
                                         <th>Location</th>
                                         <th>Status</th>
+                                        <th>Update Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {selectedBookItems.map((item: any) => (
-                                        <tr
-                                            key={item.id}
-                                            className={item.isDeleted ? "row-deleted" : ""}
-                                            style={item.isDeleted ? { opacity: 0.5, backgroundColor: '#f9f9f9' } : {}}
-                                        >
+                                        <tr key={item.id} className={item.isDeleted ? "row-deleted" : ""}>
                                             <td><code>{item.barcode}</code></td>
                                             <td>{item.location || 'Undefined'}</td>
                                             <td>
-                                                <td>
-                                                    <span className={`status-pill ${item.isDeleted ? 'deleted' : getStatusClass(item.status)}`}>
-                                                        {item.isDeleted ? 'Deleted' : (item.status)}
-                                                    </span>
-                                                </td>
+                                                <span className={`status-pill ${item.isDeleted ? 'deleted' : getStatusClass(item.status)}`}>
+                                                    {item.isDeleted ? 'Deleted' : (item.status)}
+                                                </span>
                                             </td>
                                             <td>
                                                 <select
                                                     value={typeof item.status === 'string' ? convertStatusNameToNumber(item.status) : item.status}
                                                     onChange={(e) => handleUpdateStatus(item.id, parseInt(e.target.value))}
-                                                    // Khóa nếu: Đã xóa, Đang đặt (2/Reserved), Đang mượn (3/Loaned)
                                                     disabled={
                                                         item.isDeleted ||
                                                         item.status === 2 || item.status === 'Reserved' ||
@@ -264,7 +229,6 @@ const BookManagement = () => {
                                                 </select>
                                             </td>
                                             <td>
-                                                {/* Logic hiển thị Nút bấm */}
                                                 {!item.isDeleted ? (
                                                     <button
                                                         className="btn-delete"
@@ -277,11 +241,7 @@ const BookManagement = () => {
                                                         Delete
                                                     </button>
                                                 ) : (
-                                                    <button
-                                                        className="btn-restore"
-                                                        style={{ backgroundColor: '#28a745', color: 'white', padding: '4px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                                                        onClick={() => handleRestoreItem(item.id)}
-                                                    >
+                                                    <button className="btn-restore" onClick={() => handleRestoreItem(item.id)}>
                                                         Restore
                                                     </button>
                                                 )}
@@ -291,7 +251,7 @@ const BookManagement = () => {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="modal-actions" style={{ marginTop: '20px' }}>
+                        <div className="modal-actions">
                             <button className="btn-cancel" onClick={() => setSelectedBookItems(null)}>Close</button>
                         </div>
                     </div>

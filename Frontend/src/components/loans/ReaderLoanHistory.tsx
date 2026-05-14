@@ -5,13 +5,10 @@ import LoanStatusBadge from './LoanStatusBadge';
 const ReaderLoanHistory = () => {
     const [loans, setLoans] = useState<any[]>([]);
 
-    
-
     useEffect(() => {
         const fetchHistory = async () => {
             try {
                 const res = await loanApi.getMyHistory();
-                console.log("History Loading:", res.data);
                 setLoans(res.data);
             } catch (err) {
                 console.error("Error while loading history:", err);
@@ -29,41 +26,45 @@ const ReaderLoanHistory = () => {
             const res = await loanApi.getMyHistory();
             setLoans(res.data);
         } catch (err: any) {
-            const errorMsg = err.response?.data?.Error || "Cannot extend loan (Someone has reserved it or it's overdue)";
+            const errorMsg = err.response?.data?.Error || "Cannot extend loan.";
             alert(errorMsg);
         }
     };
 
     return (
         <div className="loan-history-container">
-            <h2>Your Loan History</h2>
+            <div className="page-header">
+                <div>
+                    <h2>Your Loan History</h2>
+                </div>
+            </div>
+
             <table className="management-table">
                 <thead>
                     <tr>
-                        <th style={{ width: '35%' }}>Title / Ticket Number</th>
-                        <th style={{ width: '15%' }}>Loan Date</th>
-                        <th style={{ width: '15%' }}>Due Date</th>
-                        <th style={{ width: '15%' }}>Status</th>
-                        <th style={{ width: '20%' }}>Actions</th>
+                        <th>Title / Ticket Number</th>
+                        <th>Loan Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {loans && loans.length > 0 ? (
                         loans.map((loan) => (
-                            <React.Fragment key={loan.id}>                                
-                                {/* Các dòng chi tiết sách trong đơn đó */}
+                            <React.Fragment key={loan.id}>
                                 {loan.details && loan.details.length > 0 ? (
                                     loan.details.map((detail: any) => {
                                         const isLoanActive = detail.status === 'Active' || detail.status === 1;
                                         const isNotOverdue = new Date(detail.dueDate) > new Date();
                                         const hasNotRenewed = (detail.renewalCount || 0) < 1;
                                         const canExtend = isLoanActive && isNotOverdue && hasNotRenewed;
+
                                         return (
                                             <tr key={detail.id || detail.Id}>
-                                                <td style={{ paddingLeft: '30px' }}>
-                                                    {/* Mapping chuẩn: dùng bookTitle (viết thường chữ đầu) */}
+                                                <td>
                                                     <strong>{detail.bookTitle || detail.BookTitle || "N/A"}</strong>
-                                                    <div style={{ fontSize: '0.8em', color: '#999' }}>Barcode: {detail.barcode || "N/A"}</div>
+                                                    <div className="muted-small">Barcode: {detail.barcode || "N/A"}</div>
                                                 </td>
                                                 <td>{new Date(loan.loanDate).toLocaleDateString('vi-VN')}</td>
                                                 <td>{detail.dueDate ? new Date(detail.dueDate).toLocaleDateString('vi-VN') : '---'}</td>
@@ -75,44 +76,37 @@ const ReaderLoanHistory = () => {
                                                 </td>
                                                 <td>
                                                     {detail.accessToken ? (
-                                                        <a href={`/read/${detail.accessToken}`} className="btn-read">📖 Read E-Book</a>
+                                                        <a href={`/read/${detail.accessToken}`} className="btn-read">Read E-Book</a>
                                                     ) : (
-                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                                        <div className="stack-actions">
                                                             <span className="status-physical">At Counter</span>
-
-                                                            {/* Sử dụng biến canExtend đã tính toán ở trên */}
                                                             {canExtend && (
                                                                 <button
                                                                     onClick={() => handleExtend(detail.id)}
                                                                     className="btn-extend-action"
                                                                 >
-                                                                    ➕ Extend 7 days
+                                                                    Extend 7 days
                                                                 </button>
                                                             )}
-
                                                             {detail.renewalCount > 0 && (
-                                                                <small style={{ color: '#27ae60' }}>✓ Extended</small>
+                                                                <small className="success-text">Extended</small>
                                                             )}
                                                         </div>
                                                     )}
                                                 </td>
                                             </tr>
-                                        )
+                                        );
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} style={{ textAlign: 'center', fontStyle: 'italic', color: '#999' }}>
-                                                Have no details for this loan.
-                                        </td>
+                                        <td colSpan={5} className="empty-cell">No details for this loan.</td>
                                     </tr>
                                 )}
                             </React.Fragment>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={5} style={{ textAlign: 'center', padding: '40px' }}>
-                                Loading data or you have no loan history.
-                            </td>
+                            <td colSpan={5} className="empty-cell">No loan history found.</td>
                         </tr>
                     )}
                 </tbody>

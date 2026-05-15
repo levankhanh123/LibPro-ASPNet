@@ -9,7 +9,7 @@ const ReaderManagement = () => {
     const [editingReader, setEditingReader] = useState<any>(null);
 
     const handleDelete = async (id: string) => {
-        if (window.confirm("Are you sure you want to deactivate this reader and lock their account?")) {
+        if (window.confirm("Are you sure you want to DEACTIVATE this reader and lock their account?")) {
             try {
                 await readerApi.delete(id);
                 alert("Reader deactivated!");
@@ -30,7 +30,7 @@ const ReaderManagement = () => {
         }
     };
 
-    const loadReaders = useCallback(async () => {
+    const loadReaders = useCallback( async () => {
         try {
             const res = await readerApi.getAll();
             setReaders(res.data);
@@ -58,16 +58,13 @@ const ReaderManagement = () => {
     useEffect(() => {
         loadReaders();
     }, [loadReaders]);
-
     return (
         <div className="management-container">
-            <div className="header-actions">
+            <div className="header-actions" style={{ marginBottom: '20px' }}>
                 <div>
-                    <h2>Reader Management</h2>
+                    <h2 style={{ color: 'var(--accent)' }}>Reader Management</h2>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text)' }}>Manage library members and their profiles</p>
                 </div>
-                <button className="btn-add" onClick={() => { setEditingReader(null); setShowModal(true); }}>
-                    Register New Reader
-                </button>
             </div>
 
             <table className="management-table">
@@ -84,45 +81,46 @@ const ReaderManagement = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {loading ? (
-                        <tr><td colSpan={8} className="empty-cell">Loading...</td></tr>
-                    ) : (
-                        readers.map(reader => (
-                            <tr key={reader.id}>
-                                <td><strong>{reader.fullName}</strong></td>
-                                <td><code>{reader.libraryCardNumber}</code></td>
-                                <td>{reader.phoneNumber}</td>
-                                <td title={reader.address}>
-                                    <div className="truncate-cell">{reader.address}</div>
-                                </td>
-                                <td>
-                                    <span className="status-badge">{reader.readerTypeName}</span>
-                                </td>
-                                <td>
-                                    <span className={`status-pill ${reader.isDeleted ? 'unavailable' : 'available'}`}>
-                                        {reader.isDeleted ? 'Inactive' : 'Active'}
-                                    </span>
-                                </td>
-                                <td>{new Date(reader.expiryDate).toLocaleDateString('en-GB')}</td>
-                                <td>
-                                    <div className="table-actions">
-                                        <button className="btn-edit" onClick={() => { setEditingReader(reader); setShowModal(true); }}>
-                                            Edit
-                                        </button>
-                                        {reader.isDeleted ? (
-                                            <button className="btn-restore" onClick={() => handleRestore(reader.id)}>
-                                                Restore
-                                            </button>
-                                        ) : (
-                                            <button className="btn-delete" onClick={() => handleDelete(reader.id)}>
-                                                Deactivate
-                                            </button>
-                                        )}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))
-                    )}
+                    {readers.map(reader => (
+                        <tr key={reader.id}>
+                            <td style={{ fontWeight: '500', color: 'var(--text-h)' }}>{reader.fullName}</td>
+                            <td><code>{reader.libraryCardNumber}</code></td>
+                            <td>
+                                <div style={{ fontSize: '0.85rem' }}>{reader.phoneNumber}</div>
+                            </td>
+                            <td title={reader.address}>
+                                <div style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {reader.address}
+                                </div>
+                            </td>
+                            <td>
+                                <span className={`status-badge status-${reader.readerTypeName.toLowerCase()}`}>
+                                    {reader.readerTypeName}
+                                </span>
+                            </td>
+                            <td>
+                                {reader.isDeleted ?
+                                    <span style={{ color: '#f44336' }}>● Inactive</span> :
+                                    <span style={{ color: '#28a745' }}>● Active</span>
+                                }
+                            </td>
+                            <td>{new Date(reader.expiryDate).toLocaleDateString('en-GB')}</td>
+                            <td>
+                                <button className="btn-edit" onClick={() => { setEditingReader(reader); setShowModal(true); }}>
+                                    Edit
+                                </button>
+                                {reader.isDeleted ? (
+                                    <button className="btn-restore" onClick={() => handleRestore(reader.id)} style={{ marginLeft: '5px' }}>
+                                        Restore
+                                    </button>
+                                ) : (
+                                    <button className="btn-delete" onClick={() => handleDelete(reader.id)} style={{ marginLeft: '5px' }}>
+                                        Deactivate
+                                    </button>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 

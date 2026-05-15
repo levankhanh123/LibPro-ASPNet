@@ -62,11 +62,9 @@ const StaffManagement = () => {
     return (
         <div className="management-container">
             <header className="page-header">
-                <div>
-                    <h2>Staff Management</h2>
-                </div>
+                <h2>👔 Management System Staff</h2>
                 <button className="btn-add" onClick={() => setShowForm(true)}>
-                    Add New Librarian
+                    ➕ Add New Librarian
                 </button>
             </header>
 
@@ -86,31 +84,30 @@ const StaffManagement = () => {
                             <tr key={s.id} className={s.isDeleted ? "row-deleted row-faded" : ""}>
                                 <td>
                                     <strong>{s.fullName}</strong><br />
-                                    <small className="muted-small">ID: {s.id.substring(0, 8)}...</small>
+                                    <small style={{ color: '#888' }}>ID: {s.id.substring(0, 8)}...</small>
                                 </td>
                                 <td>{s.phoneNumber}</td>
                                 <td>{s.dateOfBirth}</td>
                                 <td>
                                     <span className={`status-pill ${s.isDeleted ? 'unavailable' : 'available'}`}>
-                                        {s.isDeleted ? "Retired" : "Active"}
+                                        {s.isDeleted ? "🔴 Retired" : "🟢 Active"}
                                     </span>
                                 </td>
                                 <td>
-                                    <div className="table-actions">
-                                        <button
-                                            className="btn-edit"
-                                            onClick={() => { setEditingStaff(s); setShowForm(true); }}
-                                            disabled={s.isDeleted}
-                                        >
-                                            Edit
-                                        </button>
+                                    {/* Nút sửa bị vô hiệu hóa nếu nhân viên đã nghỉ việc */}
+                                    <button
+                                        className="btn-edit"
+                                        onClick={() => { setEditingStaff(s); setShowForm(true); }}
+                                        disabled={s.isDeleted}
+                                    >
+                                        Edit
+                                    </button>
 
-                                        {!s.isDeleted ? (
-                                            <button className="btn-delete" onClick={() => handleToggleStatus(s)}>Delete</button>
-                                        ) : (
-                                            <button className="btn-restore" onClick={() => handleToggleStatus(s)}>Restore</button>
-                                        )}
-                                    </div>
+                                    {!s.isDeleted ? (
+                                        <button className="btn-delete" onClick={() => handleToggleStatus(s)}>Delete</button>
+                                    ) : (
+                                        <button className="btn-restore" onClick={() => handleToggleStatus(s)}>Restore</button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

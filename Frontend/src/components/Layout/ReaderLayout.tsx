@@ -1,8 +1,8 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const ReaderLayout = () => {
-    const { logout } = useAuth();
+    const { profile, logout, user } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -19,34 +19,34 @@ const ReaderLayout = () => {
                 <nav className="sidebar-nav">
                     <ul className="librarian-sidebar-menu">
                         <li>
-                            <NavLink to="/reader/books">
-                                <span className="menu-icon">BK</span>
+                            <Link to="/reader/books">
+                                <span className="menu-icon">🔍</span>
                                 <span className="menu-text">Books</span>
-                            </NavLink>
+                            </Link>
                         </li>
                         <li>
-                            <NavLink to="/reader/my-loans">
-                                <span className="menu-icon">LN</span>
+                            <Link to="/reader/my-loans">
+                                <span className="menu-icon">📖</span>
                                 <span className="menu-text">Borrowed Book History</span>
-                            </NavLink>
+                            </Link>
                         </li>
                         <li>
-                            <NavLink to="/reader/reservations">
-                                <span className="menu-icon">RS</span>
+                            <Link to="/reader/reservations">
+                                <span className="menu-icon">🔖</span>
                                 <span className="menu-text">My Reservations</span>
-                            </NavLink>
+                            </Link>
                         </li>
                         <li>
-                            <NavLink to="/reader/profile">
-                                <span className="menu-icon">ME</span>
+                            <Link to="/reader/profile">
+                                <span className="menu-icon">👤</span>
                                 <span className="menu-text">My Profile</span>
-                            </NavLink>
+                            </Link>
                         </li>
                         <li className="logout-item">
-                            <button type="button" onClick={handleLogout}>
-                                <span className="menu-icon">EX</span>
+                            <a href="#" onClick={handleLogout}>
+                                <span className="menu-icon">🚪</span>
                                 <span className="menu-text">Logout</span>
-                            </button>
+                            </a>
                         </li>
                     </ul>
                 </nav>

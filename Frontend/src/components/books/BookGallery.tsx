@@ -1,20 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { bookApi } from '../../api/bookApi';
+import { loanApi } from '../../api/loanApi';
 import { BookResponse } from '../../types/book';
-import { ReserveBookRequest } from '../../types/reservation';
 import BookCard from '././BookCard';
 import BorrowModal from '././BorrowModal';
 import { reservationApi } from '../../api/reservationApi';
-
-const getErrorMessage = (error: any) => {
-    const data = error?.response?.data;
-
-    if (typeof data === 'string' && data.trim()) {
-        return data;
-    }
-
-    return data?.message || data?.error || data?.title || error?.message || 'Error while reserving book!';
-};
 
 const BookGallery = () => {
     const [books, setBooks] = useState<BookResponse[]>([]);
@@ -30,14 +20,21 @@ const BookGallery = () => {
         setBooks(visibleBooks);
     };
 
-    const handleBorrowSubmit = async (request: ReserveBookRequest) => {
+    const handleBorrowSubmit = async (request: any) => {
+        console.log("Data load:", request.bookItemsId[0]);
         try {
-            await reservationApi.reserveBook(request);
-            alert("Book request submitted successfully.");
+            //await loanApi.createOnlineLoan(request);
+            await reservationApi.reserveBook(
+                {
+                    bookId: request.bookItemsId[0].bookId,
+                    barcode: request.bookItemsId[0].barcode
+                }
+            )
+            alert("Borrow book successfully! Get it in right shelf-location");
             setSelectedBook(null);
             loadBooks();
         } catch (error: any) {
-            alert(getErrorMessage(error));
+            alert(error.response?.data || "Error while borrow book!");
         }
     };
 

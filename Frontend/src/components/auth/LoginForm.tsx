@@ -78,8 +78,8 @@ const LoginForm = () => {
                     onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                 />
                 <button type="submit" className="login-button">Login</button>
-                <div className="register-link">
-                    <p>Don't have an account? <Link to="/register">Register now</Link></p>
+                <div className="register-link" style={{ marginTop: '15px', textAlign: 'center' }}>
+                    <p>Don't have an account? <Link to="/register" style={{ color: '#007bff', fontWeight: 'bold' }}>Register now    !</Link></p>
                 </div>
             </form>
         </div>

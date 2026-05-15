@@ -190,7 +190,7 @@ const BookFormModal = ({ isOpen, onClose, onSave, initialData }: any) => {
                     ) : (
                         <div className="form-row">
                                 <div className="form-group">
-                                    <label className={initialData ? 'label-muted' : ''}>Copies number:</label>
+                                    <label style={{ color: initialData ? '#999' : 'inherit' }}>Copies number:</label>
                                     <input
                                         type="number"
                                         name="initialCopies"

@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { BookResponse } from '../../types/book';
-import { ReserveBookRequest } from '../../types/reservation';
+import { LoanItemRequest, OnlineLoanRequest } from '../../types/loan';
 
 interface Props {
     book: BookResponse;
     onClose: () => void;
-    onConfirm: (request: ReserveBookRequest) => void;
+    onConfirm: (request: OnlineLoanRequest) => void;
 }
 
 const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
+    const [loanDays, setLoanDays] = useState(14);
+
     const activeItems = book.bookItems?.filter((i: any) => !i.isDeleted) || [];
-    const [borrowDays, setBorrowDays] = useState(7);
+
     const [selectedBarcode, setSelectedBarcode] = useState<string | undefined>(
         book.isDigital ? undefined : activeItems.find(i => String(i.status) === "Available")?.barcode
     );
@@ -21,9 +23,15 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
             return;
         }
 
-        const request: ReserveBookRequest = {
+        const selectedItem: LoanItemRequest = {
             bookId: book.id,
-            barcode: selectedBarcode ?? ''
+            isDigital: book.isDigital,
+            barcode: selectedBarcode
+        };
+
+        const request: OnlineLoanRequest = {
+            bookItemsId: [selectedItem],
+            loanDays: loanDays
         };
 
         onConfirm(request);
@@ -31,41 +39,42 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content modal-narrow">
-                <h3>Borrow Book</h3>
-                <p className="modal-copy"><strong>{book.title}</strong></p>
+            <div className="modal-content">
+                <h3>Borrow book: {book.title}</h3>
 
                 <div className="form-group">
-                    <label>Borrow Days</label>
+                    <label>Borrow number:</label>
                     <input
                         type="number"
+                        value={loanDays}
+                        onChange={(e) => setLoanDays(parseInt(e.target.value) || 0)}
                         min={1}
                         max={30}
-                        value={borrowDays}
-                        onChange={(e) => setBorrowDays(Number(e.target.value) || 1)}
                         className="form-control"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label>Book Copy</label>
+                <div className="form-group" style={{ marginTop: '15px' }}>
+                    <label>Choose a book item:</label>
                     {book.isDigital ? (
-                        <p className="status-pill available">E-Book available</p>
+                        <p className="status-available">E-Book (Always available)</p>
                     ) : (
                         <select
                             value={selectedBarcode}
                             onChange={(e) => setSelectedBarcode(e.target.value)}
                             className="form-control"
                         >
-                            {!selectedBarcode && <option value="">Choose a copy</option>}
+                            {!selectedBarcode && <option value="">-- Choose a copy --</option>}
                             {activeItems.map((item: any) => (
                                 <option
                                     key={item.id}
                                     value={item.barcode}
+                                    // Kiểm tra status bằng chuỗi "Available"
                                     disabled={String(item.status) !== "Available"}
                                 >
                                     {item.barcode}
-                                    {String(item.status) === "Available" ? ' (Available)' : ' (Unavailable)'}
+                                    {String(item.status) === "Available" ? ' (Available)' : ' (Borrowed/Broken)'}
+                                    {/* Dùng .location vì AutoMapper đã đổi tên ShelfLocation -> Location */}
                                     {item.location ? ` - Shelf: ${item.location}` : ''}
                                 </option>
                             ))}
@@ -73,14 +82,14 @@ const BorrowModal: React.FC<Props> = ({ book, onClose, onConfirm }) => {
                     )}
                 </div>
 
-                <div className="modal-actions">
+                <div className="modal-actions" style={{ marginTop: '20px' }}>
                     <button onClick={onClose} className="btn-cancel">Cancel</button>
                     <button
                         onClick={handleConfirm}
                         className="btn-confirm"
                         disabled={!book.isDigital && !selectedBarcode}
                     >
-                        Confirm Borrow
+                        Reserve book
                     </button>
                 </div>
             </div>

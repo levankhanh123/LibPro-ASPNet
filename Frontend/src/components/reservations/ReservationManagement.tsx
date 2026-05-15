@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { reservationApi } from '../../api/reservationApi';
 import ReservationStatusBadge from './ReservationStatusBadge';
+import { ReservationStatus, ReservationStatusLabels } from '../../types/reservation';
 
 interface Reservation {
     id: string;
@@ -55,22 +56,27 @@ const ReservationManagement: React.FC = () => {
         }
     };
 
-    const canConfirm = (status: string) => status.toString() === "2" || status === "Ready";
+    const renderStatusTag = (status: string) => {
+        const statusKey = status as unknown as ReservationStatus;
+        const label = ReservationStatusLabels[statusKey] || status;
+
+        let statusClass = "status-pending";
+        if (status === "Ready" || status === "1") statusClass = "status-ready";
+        if (status === "Canceled" || status === "3") statusClass = "status-canceled";
+
+        return <span className={`status-tag ${statusClass}`}>{label}</span>;
+    };
 
     return (
         <div className="loan-history-container">
-            <div className="page-header">
-                <div>
-                    <h2>Reservation Management</h2>
-                </div>
-            </div>
+            <h2>Reservation Management</h2>
 
-            {error && <p className="error-message">{error}</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
 
             <table className="management-table">
                 <thead>
                     <tr>
-                        <th>Reader</th>
+                        <th>Borrow people</th>
                         <th>Book Title</th>
                         <th>Barcode</th>
                         <th>Reservation Date</th>
@@ -80,9 +86,9 @@ const ReservationManagement: React.FC = () => {
                 </thead>
                 <tbody>
                     {loading ? (
-                        <tr><td colSpan={6} className="empty-cell">Loading...</td></tr>
+                        <tr><td colSpan={6} style={{ textAlign: 'center' }}>Loading...</td></tr>
                     ) : reservations.length === 0 ? (
-                        <tr><td colSpan={6} className="empty-cell">No reservation requests.</td></tr>
+                        <tr><td colSpan={6} style={{ textAlign: 'center' }}>No reservation requests.</td></tr>
                     ) : (
                         reservations.map((item) => (
                             <tr key={item.id}>
@@ -90,17 +96,33 @@ const ReservationManagement: React.FC = () => {
                                 <td>{item.bookTitle}</td>
                                 <td><code>{item.barcode}</code></td>
                                 <td>{new Date(item.reservedDate).toLocaleDateString('vi-VN')}</td>
-                                <td><ReservationStatusBadge status={item.status} /></td>
                                 <td>
-                                    <div className="table-actions">
+                                    {/* Gọi component Badge ở đây */}
+                                    <ReservationStatusBadge status={item.status} />
+                                </td>
+                                <td>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
                                         <button
                                             className="btn-confirm"
                                             onClick={() => handleConfirm(item.id)}
-                                            disabled={!canConfirm(item.status)}
+                                            // Sửa logic: Chỉ cho phép mượn khi status là Ready (giá trị 2 hoặc chuỗi "Ready")
+                                            disabled={item.status.toString() !== "2" && item.status !== "Ready"}
+                                            style={{
+                                                backgroundColor: (item.status.toString() === "2" || item.status === "Ready") ? '#aa3bff' : '#ccc',
+                                                color: '#fff',
+                                                border: 'none',
+                                                padding: '6px 12px',
+                                                borderRadius: '4px',
+                                                cursor: (item.status.toString() === "2" || item.status === "Ready") ? 'pointer' : 'not-allowed'
+                                            }}
                                         >
                                             Confirm Borrow
                                         </button>
-                                        <button className="btn-delete" onClick={() => handleCancel(item.id)}>
+                                        <button
+                                            className="btn-cancel"
+                                            onClick={() => handleCancel(item.id)}
+                                            style={{ backgroundColor: '#f44336', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                                        >
                                             Cancel
                                         </button>
                                     </div>

@@ -21,6 +21,7 @@ const ReaderFormModal = ({ isOpen, onClose, onSave, initialData }: any) => {
 
     useEffect(() => {
         if (initialData) {
+            // Mapping for Update (Some fields from backend address string might need manual re-entry)
             setFormData(prev => ({
                 ...prev,
                 fullName: initialData.fullName || '',
@@ -42,13 +43,16 @@ const ReaderFormModal = ({ isOpen, onClose, onSave, initialData }: any) => {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content modal-wide">
+            <div className="modal-content" style={{ maxWidth: '700px', width: '90%' }}>
                 <div className="modal-header">
-                    <h3>{initialData ? "Update Reader Profile" : "Register New Reader"}</h3>
+                    <h3 style={{ color: 'var(--accent)' }}>
+                        {initialData ? "Update Reader Profile" : "Register New Reader"}
+                    </h3>
                 </div>
 
                 <form onSubmit={handleSubmit} className="management-form">
-                    <div className="form-row">
+                    {/* Basic Information Section */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
                         <div className="form-group">
                             <label>Full Name</label>
                             <input type="text" value={formData.fullName} required
@@ -61,7 +65,7 @@ const ReaderFormModal = ({ isOpen, onClose, onSave, initialData }: any) => {
                         </div>
                     </div>
 
-                    <div className="form-row form-row-3">
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
                         <div className="form-group">
                             <label>Gender</label>
                             <select value={formData.gender} onChange={e => setFormData({ ...formData, gender: parseInt(e.target.value) })}>
@@ -84,8 +88,9 @@ const ReaderFormModal = ({ isOpen, onClose, onSave, initialData }: any) => {
                         </div>
                     </div>
 
-                    <div className="form-section-title">Address Information</div>
-                    <div className="form-panel form-row">
+                    {/* Address Section */}
+                    <label style={{ fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '10px', display: 'block' }}>Address Information</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', backgroundColor: 'var(--code-bg)', padding: '15px', borderRadius: '8px' }}>
                         <div className="form-group">
                             <input placeholder="Street Name" value={formData.street} onChange={e => setFormData({ ...formData, street: e.target.value })} />
                         </div>
@@ -100,9 +105,9 @@ const ReaderFormModal = ({ isOpen, onClose, onSave, initialData }: any) => {
                         </div>
                     </div>
 
-                    <div className="modal-actions">
+                    <div className="modal-actions" style={{ marginTop: '25px', borderTop: '1px solid var(--border)', paddingTop: '15px' }}>
                         <button type="button" onClick={onClose} className="btn-cancel">Cancel</button>
-                        <button type="submit" className="btn-save">
+                        <button type="submit" className="btn-save" style={{ backgroundColor: 'var(--accent)' }}>
                             {initialData ? "Save Changes" : "Create Account"}
                         </button>
                     </div>

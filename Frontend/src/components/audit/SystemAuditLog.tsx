@@ -10,20 +10,12 @@ const SystemAuditLog = () => {
 
     return (
         <div className="management-card">
-            <div className="page-header">
-                <div>
-                    <h2>Audit Log</h2>
-                </div>
-            </div>
-
-            <div className="table-wrap">
+            <h2>⚙️ Audit Log</h2>
+            <div className="log-container">
                 <table className="data-table">
                     <thead>
                         <tr>
-                            <th>Time</th>
-                            <th>User</th>
-                            <th>Action</th>
-                            <th>Details</th>
+                            <th>Time</th> <th>User</th> <th>Action</th> <th>Details</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,7 +24,7 @@ const SystemAuditLog = () => {
                                 <td>{new Date(log.timestamp).toLocaleString()}</td>
                                 <td><strong>{log.userName}</strong></td>
                                 <td><span className="badge-action">{log.action}</span></td>
-                                <td className="table-detail">{log.details}</td>
+                                <td style={{ fontSize: '0.85rem' }}>{log.details}</td>
                             </tr>
                         ))}
                     </tbody>
